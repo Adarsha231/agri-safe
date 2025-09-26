@@ -1,0 +1,1501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgriSafe - Antimicrobial Usage Monitoring System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            box-sizing: border-box;
+        }
+
+        .theme-option.active {
+            background-color: #f0fdf4;
+            color: #16a34a;
+        }
+
+        .theme-option:hover {
+            background-color: #f0fdf4;
+            color: #16a34a;
+        }
+
+        .dark .theme-option.active {
+            background-color: #1f2937;
+            color: #10b981;
+        }
+
+        .dark .theme-option:hover {
+            background-color: #374151;
+            color: #10b981;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg fixed w-full top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <button id="sidebarToggle" class="text-gray-600 hover:text-gray-800 mr-4">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                    <div class="flex-shrink-0 flex items-center">
+                        <i class="fas fa-shield-alt text-green-600 text-2xl mr-2"></i>
+                        <span class="text-xl font-bold text-gray-800">AgriSafe</span>
+                    </div>
+                </div>
+                
+                <!-- Desktop Menu -->
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="#home" class="text-gray-700 hover:text-green-600 px-3 py-2 rounded-md text-sm font-medium transition duration-200" data-translate="home">Home</a>
+                    <a href="#features" class="text-gray-700 hover:text-green-600 px-3 py-2 rounded-md text-sm font-medium transition duration-200" data-translate="features">Features</a>
+                    <a href="#about" class="text-gray-700 hover:text-green-600 px-3 py-2 rounded-md text-sm font-medium transition duration-200" data-translate="about">About</a>
+                    <a href="#contact" class="text-gray-700 hover:text-green-600 px-3 py-2 rounded-md text-sm font-medium transition duration-200" data-translate="contact">Contact</a>
+                    <div class="relative">
+                        <select id="headerLanguageSelect" class="bg-transparent border border-gray-300 text-gray-700 px-3 py-1 rounded-md text-sm focus:outline-none focus:border-green-500">
+                            <option value="en">EN</option>
+                            <option value="kn">ಕನ್ನಡ</option>
+                            <option value="hi">हिंदी</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Mobile menu button and auth buttons -->
+                <div class="flex items-center space-x-4">
+                    <div class="hidden sm:flex items-center space-x-4">
+                        <button id="loginBtn" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition duration-200" data-translate="login">
+                            Login
+                        </button>
+                        <button id="signupBtn" class="border border-green-600 text-green-600 hover:bg-green-50 px-4 py-2 rounded-lg transition duration-200" data-translate="signup">
+                            Sign Up
+                        </button>
+                    </div>
+                    
+                    <!-- Mobile menu button -->
+                    <button id="mobileMenuBtn" class="md:hidden text-gray-600 hover:text-gray-800">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Menu -->
+        <div id="mobileMenu" class="md:hidden hidden bg-white border-t border-gray-200">
+            <div class="px-2 pt-2 pb-3 space-y-1">
+                <a href="#home" class="block text-gray-700 hover:text-green-600 hover:bg-gray-50 px-3 py-2 rounded-md text-base font-medium transition duration-200" data-translate="home">Home</a>
+                <a href="#features" class="block text-gray-700 hover:text-green-600 hover:bg-gray-50 px-3 py-2 rounded-md text-base font-medium transition duration-200" data-translate="features">Features</a>
+                <a href="#about" class="block text-gray-700 hover:text-green-600 hover:bg-gray-50 px-3 py-2 rounded-md text-base font-medium transition duration-200" data-translate="about">About</a>
+                <a href="#contact" class="block text-gray-700 hover:text-green-600 hover:bg-gray-50 px-3 py-2 rounded-md text-base font-medium transition duration-200" data-translate="contact">Contact</a>
+                <div class="px-3 py-2">
+                    <select id="mobileLanguageSelect" class="w-full bg-transparent border border-gray-300 text-gray-700 px-3 py-2 rounded-md text-sm focus:outline-none focus:border-green-500">
+                        <option value="en">English</option>
+                        <option value="kn">ಕನ್ನಡ (Kannada)</option>
+                        <option value="hi">हिंदी (Hindi)</option>
+                    </select>
+                </div>
+                <div class="px-3 py-2 space-y-2 sm:hidden">
+                    <button id="mobileLoginBtn" class="w-full bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition duration-200" data-translate="login">
+                        Login
+                    </button>
+                    <button id="mobileSignupBtn" class="w-full border border-green-600 text-green-600 hover:bg-green-50 px-4 py-2 rounded-lg transition duration-200" data-translate="signup">
+                        Sign Up
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Sidebar -->
+    <div id="sidebar" class="fixed left-0 top-16 h-full w-64 bg-white shadow-lg transform -translate-x-full transition-transform duration-300 ease-in-out z-40 hidden">
+        <div class="p-6">
+            <div class="space-y-4">
+                <!-- Navigation Links -->
+                <div class="border-b border-gray-200 pb-4">
+                    <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3" data-translate="navigation">Navigation</h3>
+                    <div class="space-y-2">
+                        <button id="sidebarFarmer" class="w-full flex items-center px-3 py-2 text-left text-gray-700 hover:bg-green-50 hover:text-green-600 rounded-lg transition duration-200">
+                            <i class="fas fa-tractor mr-3"></i>
+                            <span data-translate="farmer">Farmer</span>
+                        </button>
+                        <button id="sidebarRegulator" class="w-full flex items-center px-3 py-2 text-left text-gray-700 hover:bg-green-50 hover:text-green-600 rounded-lg transition duration-200">
+                            <i class="fas fa-clipboard-check mr-3"></i>
+                            <span data-translate="regulator">Regulator</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Settings -->
+                <div>
+                    <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3" data-translate="settings">Settings</h3>
+                    <div class="space-y-2">
+                        <div class="px-3 py-2">
+                            <label class="block text-sm font-medium text-gray-700 mb-2" data-translate="language">Language</label>
+                            <select id="languageSelect" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-green-500 text-sm">
+                                <option value="en">English</option>
+                                <option value="kn">ಕನ್ನಡ (Kannada)</option>
+                                <option value="hi">हिंदी (Hindi)</option>
+                            </select>
+                        </div>
+                        <div class="px-3 py-2">
+                            <label class="block text-sm font-medium text-gray-700 mb-2" data-translate="theme">Theme</label>
+                            <div class="space-y-2">
+                                <button id="lightTheme" class="theme-option w-full flex items-center px-3 py-2 text-left text-gray-700 hover:bg-green-50 hover:text-green-600 rounded-lg transition duration-200 active">
+                                    <i class="fas fa-sun mr-3 text-yellow-500"></i>
+                                    <span data-translate="light_theme">Light Theme</span>
+                                    <i class="fas fa-check ml-auto text-green-600"></i>
+                                </button>
+                                <button id="darkTheme" class="theme-option w-full flex items-center px-3 py-2 text-left text-gray-700 hover:bg-green-50 hover:text-green-600 rounded-lg transition duration-200">
+                                    <i class="fas fa-moon mr-3 text-blue-500"></i>
+                                    <span data-translate="dark_theme">Dark Theme</span>
+                                    <i class="fas fa-check ml-auto text-green-600 hidden"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sidebar Overlay -->
+    <div id="sidebarOverlay" class="fixed inset-0 bg-black bg-opacity-50 z-30 hidden"></div>
+
+    <!-- Main Content Container -->
+    <div id="mainContent" class="pt-16">
+        <!-- Landing Page -->
+        <div id="landingPage">
+            <!-- Hero Section -->
+            <section id="home" class="bg-gradient-to-r from-green-600 to-blue-600 text-white py-20">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                    <h1 class="text-5xl font-bold mb-6" data-translate="hero_title">Safe Food, Healthy Animals</h1>
+                    <p class="text-xl mb-8 max-w-3xl mx-auto" data-translate="hero_description">
+                        Comprehensive antimicrobial usage monitoring system ensuring food safety, animal welfare, and regulatory compliance through advanced tracking and blockchain technology.
+                    </p>
+                    <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                        <button id="getStartedBtn" class="bg-white text-green-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition duration-200" data-translate="get_started">
+                            Get Started
+                        </button>
+                        <button class="border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-green-600 transition duration-200" data-translate="learn_more">
+                            Learn More
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Features Section -->
+            <section id="features" class="py-16 bg-white">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <h2 class="text-3xl font-bold text-center text-gray-800 mb-12" data-translate="key_features">Key Features</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                        <div class="text-center p-6 bg-gray-50 rounded-lg">
+                            <i class="fas fa-chart-line text-4xl text-green-600 mb-4"></i>
+                            <h3 class="text-xl font-semibold mb-2" data-translate="usage_tracking">Usage Tracking</h3>
+                            <p class="text-gray-600" data-translate="usage_tracking_desc">Real-time monitoring of antimicrobial usage across all animals</p>
+                        </div>
+                        <div class="text-center p-6 bg-gray-50 rounded-lg">
+                            <i class="fas fa-bell text-4xl text-blue-600 mb-4"></i>
+                            <h3 class="text-xl font-semibold mb-2" data-translate="withdrawal_alerts">Withdrawal Alerts</h3>
+                            <p class="text-gray-600" data-translate="withdrawal_alerts_desc">Automated alerts for withdrawal periods and compliance</p>
+                        </div>
+                        <div class="text-center p-6 bg-gray-50 rounded-lg">
+                            <i class="fas fa-tachometer-alt text-4xl text-purple-600 mb-4"></i>
+                            <h3 class="text-xl font-semibold mb-2" data-translate="realtime_dashboard">Real-time Dashboard</h3>
+                            <p class="text-gray-600" data-translate="realtime_dashboard_desc">Comprehensive dashboards for all stakeholders</p>
+                        </div>
+                        <div class="text-center p-6 bg-gray-50 rounded-lg">
+                            <i class="fas fa-link text-4xl text-orange-600 mb-4"></i>
+                            <h3 class="text-xl font-semibold mb-2" data-translate="blockchain_traceability">Blockchain Traceability</h3>
+                            <p class="text-gray-600" data-translate="blockchain_traceability_desc">Immutable records for complete transparency</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- About Section -->
+            <section id="about" class="py-16 bg-gray-50">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="text-center mb-12">
+                        <h2 class="text-3xl font-bold text-gray-800 mb-4" data-translate="about_title">About AgriSafe</h2>
+                        <p class="text-lg text-gray-600 max-w-3xl mx-auto" data-translate="about_description">
+                            AgriSafe is a cutting-edge platform designed to revolutionize antimicrobial usage monitoring in agriculture. Our mission is to ensure food safety while promoting responsible antimicrobial use.
+                        </p>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        <div class="text-center">
+                            <div class="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <i class="fas fa-leaf text-green-600 text-2xl"></i>
+                            </div>
+                            <h3 class="text-xl font-semibold mb-2" data-translate="mission">Our Mission</h3>
+                            <p class="text-gray-600" data-translate="mission_desc">To create a sustainable and safe food system through innovative technology and responsible practices.</p>
+                        </div>
+                        <div class="text-center">
+                            <div class="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <i class="fas fa-eye text-blue-600 text-2xl"></i>
+                            </div>
+                            <h3 class="text-xl font-semibold mb-2" data-translate="vision">Our Vision</h3>
+                            <p class="text-gray-600" data-translate="vision_desc">A world where every food product is traceable, safe, and produced with minimal environmental impact.</p>
+                        </div>
+                        <div class="text-center">
+                            <div class="bg-purple-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <i class="fas fa-handshake text-purple-600 text-2xl"></i>
+                            </div>
+                            <h3 class="text-xl font-semibold mb-2" data-translate="values">Our Values</h3>
+                            <p class="text-gray-600" data-translate="values_desc">Transparency, innovation, sustainability, and collaboration with farmers and regulators worldwide.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Contact Section -->
+            <section id="contact" class="py-16 bg-white">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="text-center mb-12">
+                        <h2 class="text-3xl font-bold text-gray-800 mb-4" data-translate="contact_title">Contact Us</h2>
+                        <p class="text-lg text-gray-600" data-translate="contact_description">
+                            Get in touch with our team for support, partnerships, or more information about AgriSafe.
+                        </p>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+                        <div>
+                            <h3 class="text-xl font-semibold mb-6" data-translate="contact_info">Contact Information</h3>
+                            <div class="space-y-4">
+                                <div class="flex items-center">
+                                    <i class="fas fa-envelope text-green-600 mr-4"></i>
+                                    <span>support@agrisafe.com</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <i class="fas fa-phone text-green-600 mr-4"></i>
+                                    <span>+1 (555) 123-4567</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <i class="fas fa-map-marker-alt text-green-600 mr-4"></i>
+                                    <span>123 AgriTech Street, Farm City, FC 12345</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-semibold mb-6" data-translate="send_message">Send us a Message</h3>
+                            <form id="contactForm" class="space-y-4">
+                                <div>
+                                    <input type="text" placeholder="Your Name" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-green-500" data-translate-placeholder="your_name">
+                                </div>
+                                <div>
+                                    <input type="email" placeholder="Your Email" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-green-500" data-translate-placeholder="your_email">
+                                </div>
+                                <div>
+                                    <textarea rows="4" placeholder="Your Message" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-green-500" data-translate-placeholder="your_message"></textarea>
+                                </div>
+                                <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg transition duration-200" data-translate="send_message_btn">
+                                    Send Message
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Login Modal -->
+        <div id="loginModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center">
+            <div class="bg-white rounded-lg p-8 max-w-md w-full mx-4">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800">Login to AgriSafe</h2>
+                    <button id="closeLogin" class="text-gray-500 hover:text-gray-700">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+                <form id="loginForm">
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Email or Phone</label>
+                        <input type="text" id="loginIdentifier" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-green-500" placeholder="Enter email or phone number">
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Role</label>
+                        <select id="userRole" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-green-500">
+                            <option value="farmer">Farmer</option>
+                            <option value="regulator">Regulator</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg transition duration-200">
+                        Send OTP
+                    </button>
+                </form>
+                <div id="otpSection" class="hidden mt-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Enter OTP</label>
+                    <input type="text" id="otpInput" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-green-500" placeholder="Enter 6-digit OTP">
+                    <button id="verifyOtp" class="w-full mt-4 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition duration-200">
+                        Verify & Login
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Farmer Dashboard -->
+        <div id="farmerDashboard" class="hidden">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                <div class="flex justify-between items-center mb-8">
+                    <div class="flex items-center">
+                        <button id="sidebarToggle" class="text-gray-600 hover:text-gray-800 mr-4">
+                            <i class="fas fa-bars text-xl"></i>
+                        </button>
+                        <button id="backToLanding" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg mr-4">
+                            <i class="fas fa-arrow-left"></i>
+                        </button>
+                        <h1 class="text-3xl font-bold text-gray-800" data-translate="farmer_dashboard">Farmer Dashboard</h1>
+                    </div>
+                    <button id="logoutBtn" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg">
+                        <i class="fas fa-sign-out-alt mr-2"></i><span data-translate="logout">Logout</span>
+                    </button>
+                </div>
+
+                <!-- Stats Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                    <div class="bg-white p-6 rounded-lg shadow">
+                        <div class="flex items-center">
+                            <div class="p-3 rounded-full bg-blue-100 text-blue-600">
+                                <i class="fas fa-paw text-xl"></i>
+                            </div>
+                            <div class="ml-4">
+                                <p class="text-sm font-medium text-gray-600" data-translate="total_animals">Total Animals</p>
+                                <p class="text-2xl font-semibold text-gray-900">247</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow">
+                        <div class="flex items-center">
+                            <div class="p-3 rounded-full bg-green-100 text-green-600">
+                                <i class="fas fa-pills text-xl"></i>
+                            </div>
+                            <div class="ml-4">
+                                <p class="text-sm font-medium text-gray-600" data-translate="active_treatments">Active Treatments</p>
+                                <p class="text-2xl font-semibold text-gray-900">12</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow">
+                        <div class="flex items-center">
+                            <div class="p-3 rounded-full bg-yellow-100 text-yellow-600">
+                                <i class="fas fa-exclamation-triangle text-xl"></i>
+                            </div>
+                            <div class="ml-4">
+                                <p class="text-sm font-medium text-gray-600" data-translate="pending_alerts">Pending Alerts</p>
+                                <p class="text-2xl font-semibold text-gray-900">3</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow">
+                        <div class="flex items-center">
+                            <div class="p-3 rounded-full bg-purple-100 text-purple-600">
+                                <i class="fas fa-calendar-check text-xl"></i>
+                            </div>
+                            <div class="ml-4">
+                                <p class="text-sm font-medium text-gray-600" data-translate="withdrawal_due">Withdrawal Due</p>
+                                <p class="text-2xl font-semibold text-gray-900">5</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <button id="addAnimalBtn" class="bg-green-600 hover:bg-green-700 text-white p-6 rounded-lg text-center transition duration-200">
+                        <i class="fas fa-plus text-2xl mb-2"></i>
+                        <p class="font-semibold">Add New Animal</p>
+                    </button>
+                    <button id="recordTreatmentBtn" class="bg-blue-600 hover:bg-blue-700 text-white p-6 rounded-lg text-center transition duration-200">
+                        <i class="fas fa-syringe text-2xl mb-2"></i>
+                        <p class="font-semibold">Record Treatment</p>
+                    </button>
+                    <button id="scanQrBtn" class="bg-purple-600 hover:bg-purple-700 text-white p-6 rounded-lg text-center transition duration-200">
+                        <i class="fas fa-qrcode text-2xl mb-2"></i>
+                        <p class="font-semibold">Scan QR/Barcode</p>
+                    </button>
+                </div>
+
+                <!-- Recent Animals Table -->
+                <div class="bg-white rounded-lg shadow mb-8">
+                    <div class="px-6 py-4 border-b border-gray-200">
+                        <h3 class="text-lg font-semibold text-gray-800">Recent Animals</h3>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Animal ID</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Species</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Age</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Health Status</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">COW-001</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Cattle</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">3 years</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Healthy</span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                        <button class="text-blue-600 hover:text-blue-900 mr-3">View</button>
+                                        <button class="text-green-600 hover:text-green-900 mr-3">Edit</button>
+                                        <button class="text-red-600 hover:text-red-900" onclick="deleteAnimal('COW-001')">Delete</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">PIG-045</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Swine</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">8 months</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">Under Treatment</span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                        <button class="text-blue-600 hover:text-blue-900 mr-3">View</button>
+                                        <button class="text-green-600 hover:text-green-900 mr-3">Edit</button>
+                                        <button class="text-red-600 hover:text-red-900" onclick="deleteAnimal('PIG-045')">Delete</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Withdrawal Alerts -->
+                <div class="bg-white rounded-lg shadow">
+                    <div class="px-6 py-4 border-b border-gray-200">
+                        <h3 class="text-lg font-semibold text-gray-800">Withdrawal Alerts</h3>
+                    </div>
+                    <div class="p-6">
+                        <div class="space-y-4">
+                            <div class="flex items-center p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                                <i class="fas fa-exclamation-triangle text-yellow-600 mr-3"></i>
+                                <div class="flex-1">
+                                    <p class="font-semibold text-gray-800">COW-001 - Withdrawal period ends in 2 days</p>
+                                    <p class="text-sm text-gray-600">Penicillin treatment - Safe for consumption on March 15, 2024</p>
+                                </div>
+                                <button class="bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded-lg text-sm">
+                                    Mark Safe
+                                </button>
+                            </div>
+                            <div class="flex items-center p-4 bg-red-50 border border-red-200 rounded-lg">
+                                <i class="fas fa-ban text-red-600 mr-3"></i>
+                                <div class="flex-1">
+                                    <p class="font-semibold text-gray-800">PIG-045 - Still in withdrawal period</p>
+                                    <p class="text-sm text-gray-600">Tetracycline treatment - Safe for consumption on March 20, 2024</p>
+                                </div>
+                                <span class="bg-red-600 text-white px-4 py-2 rounded-lg text-sm">
+                                    5 days left
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+        <!-- Regulator Dashboard -->
+        <div id="regulatorDashboard" class="hidden">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                <div class="flex justify-between items-center mb-8">
+                    <div class="flex items-center">
+                        <button id="regBackToLanding" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg mr-4">
+                            <i class="fas fa-arrow-left"></i>
+                        </button>
+                        <h1 class="text-3xl font-bold text-gray-800">Regulator Dashboard</h1>
+                    </div>
+                    <button id="regLogoutBtn" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg">
+                        <i class="fas fa-sign-out-alt mr-2"></i>Logout
+                    </button>
+                </div>
+
+                <!-- Stats Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                    <div class="bg-white p-6 rounded-lg shadow">
+                        <div class="flex items-center">
+                            <div class="p-3 rounded-full bg-blue-100 text-blue-600">
+                                <i class="fas fa-building text-xl"></i>
+                            </div>
+                            <div class="ml-4">
+                                <p class="text-sm font-medium text-gray-600">Registered Farms</p>
+                                <p class="text-2xl font-semibold text-gray-900">1,247</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow">
+                        <div class="flex items-center">
+                            <div class="p-3 rounded-full bg-green-100 text-green-600">
+                                <i class="fas fa-pills text-xl"></i>
+                            </div>
+                            <div class="ml-4">
+                                <p class="text-sm font-medium text-gray-600 flex items-center">
+                                    AMU Records
+                                    <span class="ml-2 group relative">
+                                        <i class="fas fa-info-circle text-gray-400 cursor-help"></i>
+                                        <div class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-800 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap z-10">
+                                            Antimicrobial Usage Records - tracks all antibiotic treatments
+                                        </div>
+                                    </span>
+                                </p>
+                                <p class="text-2xl font-semibold text-gray-900">15,432</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts Section -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                    <div class="bg-white rounded-lg shadow">
+                        <div class="px-6 py-4 border-b border-gray-200">
+                            <h3 class="text-lg font-semibold text-gray-800">AMU Trends by Species</h3>
+                        </div>
+                        <div class="p-6">
+                            <canvas id="speciesChart" width="400" height="200"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow">
+                        <div class="px-6 py-4 border-b border-gray-200">
+                            <h3 class="text-lg font-semibold text-gray-800">Regional AMU Distribution</h3>
+                        </div>
+                        <div class="p-6">
+                            <canvas id="regionChart" width="400" height="200"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                    <button class="bg-green-600 hover:bg-green-700 text-white p-6 rounded-lg text-center transition duration-200">
+                        <i class="fas fa-file-alt text-2xl mb-2"></i>
+                        <p class="font-semibold">Generate Report</p>
+                    </button>
+                    <button class="bg-blue-600 hover:bg-blue-700 text-white p-6 rounded-lg text-center transition duration-200">
+                        <i class="fas fa-download text-2xl mb-2"></i>
+                        <p class="font-semibold">Export Data</p>
+                    </button>
+                    <button class="bg-purple-600 hover:bg-purple-700 text-white p-6 rounded-lg text-center transition duration-200">
+                        <i class="fas fa-link text-2xl mb-2"></i>
+                        <p class="font-semibold">Blockchain Trace</p>
+                    </button>
+                    <button class="bg-orange-600 hover:bg-orange-700 text-white p-6 rounded-lg text-center transition duration-200">
+                        <i class="fas fa-search text-2xl mb-2"></i>
+                        <p class="font-semibold">Compliance Check</p>
+                    </button>
+                </div>
+
+                <!-- Recent Reports -->
+                <div class="bg-white rounded-lg shadow">
+                    <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+                        <h3 class="text-lg font-semibold text-gray-800">Recent Compliance Reports</h3>
+                        <div class="flex space-x-2">
+                            <button class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm">
+                                <i class="fas fa-file-pdf mr-2"></i>Export PDF
+                            </button>
+                            <button class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm">
+                                <i class="fas fa-file-excel mr-2"></i>Export Excel
+                            </button>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Farm ID</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Region</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Compliance Score</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Last Inspection</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">FARM-001</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">North Region</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">95%</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-03-10</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Compliant</span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                        <button class="text-blue-600 hover:text-blue-900 mr-3">View Report</button>
+                                        <button class="text-purple-600 hover:text-purple-900">Trace</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">FARM-045</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">South Region</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">78%</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-03-08</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">Review Required</span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                        <button class="text-blue-600 hover:text-blue-900 mr-3">View Report</button>
+                                        <button class="text-purple-600 hover:text-purple-900">Trace</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Animal Modal -->
+    <div id="addAnimalModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center">
+        <div class="bg-white rounded-lg p-8 max-w-md w-full mx-4">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-800">Add New Animal</h2>
+                <button id="closeAddAnimal" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            <form id="addAnimalForm">
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Animal ID</label>
+                    <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-green-500" placeholder="e.g., COW-123">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Species</label>
+                    <select class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-green-500">
+                        <option value="cattle">Cattle</option>
+                        <option value="swine">Swine</option>
+                        <option value="poultry">Poultry</option>
+                        <option value="sheep">Sheep</option>
+                        <option value="goat">Goat</option>
+                    </select>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Age</label>
+                    <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-green-500" placeholder="e.g., 2 years">
+                </div>
+                <div class="mb-6">
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Health Status</label>
+                    <select class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-green-500">
+                        <option value="healthy">Healthy</option>
+                        <option value="sick">Sick</option>
+                        <option value="under-treatment">Under Treatment</option>
+                        <option value="quarantine">Quarantine</option>
+                    </select>
+                </div>
+                <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg transition duration-200">
+                    Add Animal
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Record Treatment Modal -->
+    <div id="recordTreatmentModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center">
+        <div class="bg-white rounded-lg p-8 max-w-md w-full mx-4">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-800">Record Treatment</h2>
+                <button id="closeRecordTreatment" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            <form id="recordTreatmentForm">
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Animal ID</label>
+                    <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-green-500" placeholder="e.g., COW-123">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Drug Name</label>
+                    <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-green-500" placeholder="e.g., Amoxicillin">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Dose</label>
+                    <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-green-500" placeholder="e.g., 10mg/kg">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Frequency</label>
+                    <select class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-green-500">
+                        <option value="once-daily">Once Daily</option>
+                        <option value="twice-daily">Twice Daily</option>
+                        <option value="three-times-daily">Three Times Daily</option>
+                        <option value="as-needed">As Needed</option>
+                    </select>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Reason</label>
+                    <textarea class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-green-500" rows="3" placeholder="Reason for treatment"></textarea>
+                </div>
+                <div class="mb-6">
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Vet Prescription ID</label>
+                    <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-green-500" placeholder="Prescription reference">
+                </div>
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition duration-200">
+                    Record Treatment
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Global state
+        let currentUser = null;
+        let currentRole = null;
+        let currentLanguage = 'en';
+        let currentTheme = 'light';
+        let animals = [
+            { id: 'COW-001', species: 'Cattle', age: '3 years', status: 'Healthy' },
+            { id: 'PIG-045', species: 'Swine', age: '8 months', status: 'Under Treatment' }
+        ];
+
+        // Translation dictionary
+        const translations = {
+            en: {
+                // Navigation
+                login: 'Login',
+                signup: 'Sign Up',
+                home: 'Home',
+                features: 'Features',
+                about: 'About',
+                contact: 'Contact',
+                navigation: 'Navigation',
+                farmer: 'Farmer',
+                regulator: 'Regulator',
+                settings: 'Settings',
+                language: 'Language',
+                back: 'Back',
+                logout: 'Logout',
+                
+                // Landing page
+                hero_title: 'Safe Food, Healthy Animals',
+                hero_description: 'Comprehensive antimicrobial usage monitoring system ensuring food safety, animal welfare, and regulatory compliance through advanced tracking and blockchain technology.',
+                get_started: 'Get Started',
+                learn_more: 'Learn More',
+                key_features: 'Key Features',
+                usage_tracking: 'Usage Tracking',
+                usage_tracking_desc: 'Real-time monitoring of antimicrobial usage across all animals',
+                withdrawal_alerts: 'Withdrawal Alerts',
+                withdrawal_alerts_desc: 'Automated alerts for withdrawal periods and compliance',
+                realtime_dashboard: 'Real-time Dashboard',
+                realtime_dashboard_desc: 'Comprehensive dashboards for all stakeholders',
+                blockchain_traceability: 'Blockchain Traceability',
+                blockchain_traceability_desc: 'Immutable records for complete transparency',
+                
+                // Farmer Dashboard
+                farmer_dashboard: 'Farmer Dashboard',
+                total_animals: 'Total Animals',
+                active_treatments: 'Active Treatments',
+                pending_alerts: 'Pending Alerts',
+                withdrawal_due: 'Withdrawal Due',
+                
+                // About Section
+                about_title: 'About AgriSafe',
+                about_description: 'AgriSafe is a cutting-edge platform designed to revolutionize antimicrobial usage monitoring in agriculture. Our mission is to ensure food safety while promoting responsible antimicrobial use.',
+                mission: 'Our Mission',
+                mission_desc: 'To create a sustainable and safe food system through innovative technology and responsible practices.',
+                vision: 'Our Vision',
+                vision_desc: 'A world where every food product is traceable, safe, and produced with minimal environmental impact.',
+                values: 'Our Values',
+                values_desc: 'Transparency, innovation, sustainability, and collaboration with farmers and regulators worldwide.',
+                
+                // Contact Section
+                contact_title: 'Contact Us',
+                contact_description: 'Get in touch with our team for support, partnerships, or more information about AgriSafe.',
+                contact_info: 'Contact Information',
+                send_message: 'Send us a Message',
+                send_message_btn: 'Send Message',
+                
+                // Theme Settings
+                theme: 'Theme',
+                light_theme: 'Light Theme',
+                dark_theme: 'Dark Theme'
+            },
+            kn: {
+                // Navigation
+                login: 'ಲಾಗಿನ್',
+                signup: 'ಸೈನ್ ಅಪ್',
+                home: 'ಮುಖ್ಯ',
+                features: 'ವೈಶಿಷ್ಟ್ಯಗಳು',
+                about: 'ನಮ್ಮ ಬಗ್ಗೆ',
+                contact: 'ಸಂಪರ್ಕಿಸಿ',
+                navigation: 'ನ್ಯಾವಿಗೇಷನ್',
+                farmer: 'ರೈತ',
+                regulator: 'ನಿಯಂತ್ರಕ',
+                settings: 'ಸೆಟ್ಟಿಂಗ್‌ಗಳು',
+                language: 'ಭಾಷೆ',
+                back: 'ಹಿಂದೆ',
+                logout: 'ಲಾಗ್ಔಟ್',
+                
+                // Landing page
+                hero_title: 'ಸುರಕ್ಷಿತ ಆಹಾರ, ಆರೋಗ್ಯಕರ ಪ್ರಾಣಿಗಳು',
+                hero_description: 'ಆಹಾರ ಸುರಕ್ಷತೆ, ಪ್ರಾಣಿ ಕಲ್ಯಾಣ ಮತ್ತು ನಿಯಂತ್ರಕ ಅನುಸರಣೆಯನ್ನು ಖಾತ್ರಿಪಡಿಸುವ ಸಮಗ್ರ ಆಂಟಿಮೈಕ್ರೋಬಿಯಲ್ ಬಳಕೆ ಮಾನಿಟರಿಂಗ್ ಸಿಸ್ಟಮ್.',
+                get_started: 'ಪ್ರಾರಂಭಿಸಿ',
+                learn_more: 'ಇನ್ನಷ್ಟು ತಿಳಿಯಿರಿ',
+                key_features: 'ಮುಖ್ಯ ವೈಶಿಷ್ಟ್ಯಗಳು',
+                usage_tracking: 'ಬಳಕೆ ಟ್ರ್ಯಾಕಿಂಗ್',
+                usage_tracking_desc: 'ಎಲ್ಲಾ ಪ್ರಾಣಿಗಳಲ್ಲಿ ಆಂಟಿಮೈಕ್ರೋಬಿಯಲ್ ಬಳಕೆಯ ನೈಜ-ಸಮಯ ಮಾನಿಟರಿಂಗ್',
+                withdrawal_alerts: 'ವಿತ್‌ಡ್ರಾವಲ್ ಅಲರ್ಟ್‌ಗಳು',
+                withdrawal_alerts_desc: 'ವಿತ್‌ಡ್ರಾವಲ್ ಅವಧಿಗಳು ಮತ್ತು ಅನುಸರಣೆಗಾಗಿ ಸ್ವಯಂಚಾಲಿತ ಅಲರ್ಟ್‌ಗಳು',
+                realtime_dashboard: 'ನೈಜ-ಸಮಯ ಡ್ಯಾಶ್‌ಬೋರ್ಡ್',
+                realtime_dashboard_desc: 'ಎಲ್ಲಾ ಪಾಲುದಾರರಿಗೆ ಸಮಗ್ರ ಡ್ಯಾಶ್‌ಬೋರ್ಡ್‌ಗಳು',
+                blockchain_traceability: 'ಬ್ಲಾಕ್‌ಚೈನ್ ಟ್ರೇಸಬಿಲಿಟಿ',
+                blockchain_traceability_desc: 'ಸಂಪೂರ್ಣ ಪಾರದರ್ಶಕತೆಗಾಗಿ ಬದಲಾಯಿಸಲಾಗದ ದಾಖಲೆಗಳು',
+                
+                // Farmer Dashboard
+                farmer_dashboard: 'ರೈತ ಡ್ಯಾಶ್‌ಬೋರ್ಡ್',
+                total_animals: 'ಒಟ್ಟು ಪ್ರಾಣಿಗಳು',
+                active_treatments: 'ಸಕ್ರಿಯ ಚಿಕಿತ್ಸೆಗಳು',
+                pending_alerts: 'ಬಾಕಿ ಅಲರ್ಟ್‌ಗಳು',
+                withdrawal_due: 'ವಿತ್‌ಡ್ರಾವಲ್ ಬಾಕಿ',
+                
+                // About Section
+                about_title: 'ಅಗ್ರಿಸೇಫ್ ಬಗ್ಗೆ',
+                about_description: 'ಅಗ್ರಿಸೇಫ್ ಕೃಷಿಯಲ್ಲಿ ಆಂಟಿಮೈಕ್ರೋಬಿಯಲ್ ಬಳಕೆಯ ಮಾನಿಟರಿಂಗ್ ಅನ್ನು ಕ್ರಾಂತಿಗೊಳಿಸಲು ವಿನ್ಯಾಸಗೊಳಿಸಲಾದ ಅತ್ಯಾಧುನಿಕ ವೇದಿಕೆಯಾಗಿದೆ.',
+                mission: 'ನಮ್ಮ ಧ್ಯೇಯ',
+                mission_desc: 'ನವೀನ ತಂತ್ರಜ್ಞಾನ ಮತ್ತು ಜವಾಬ್ದಾರಿಯುತ ಅಭ್ಯಾಸಗಳ ಮೂಲಕ ಸುಸ್ಥಿರ ಮತ್ತು ಸುರಕ್ಷಿತ ಆಹಾರ ವ್ಯವಸ್ಥೆಯನ್ನು ರಚಿಸುವುದು.',
+                vision: 'ನಮ್ಮ ದೃಷ್ಟಿ',
+                vision_desc: 'ಪ್ರತಿ ಆಹಾರ ಉತ್ಪಾದನೆಯು ಪತ್ತೆಹಚ್ಚಬಹುದಾದ, ಸುರಕ್ಷಿತ ಮತ್ತು ಕನಿಷ್ಠ ಪರಿಸರ ಪ್ರಭಾವದೊಂದಿಗೆ ಉತ್ಪಾದಿಸಲ್ಪಟ್ಟ ಜಗತ್ತು.',
+                values: 'ನಮ್ಮ ಮೌಲ್ಯಗಳು',
+                values_desc: 'ಪಾರದರ್ಶಕತೆ, ನಾವೀನ್ಯತೆ, ಸುಸ್ಥಿರತೆ ಮತ್ತು ವಿಶ್ವಾದ್ಯಂತ ರೈತರು ಮತ್ತು ನಿಯಂತ್ರಕರೊಂದಿಗೆ ಸಹಯೋಗ.',
+                
+                // Contact Section
+                contact_title: 'ನಮ್ಮನ್ನು ಸಂಪರ್ಕಿಸಿ',
+                contact_description: 'ಬೆಂಬಲ, ಪಾಲುದಾರಿಕೆ ಅಥವಾ ಅಗ್ರಿಸೇಫ್ ಬಗ್ಗೆ ಹೆಚ್ಚಿನ ಮಾಹಿತಿಗಾಗಿ ನಮ್ಮ ತಂಡವನ್ನು ಸಂಪರ್ಕಿಸಿ.',
+                contact_info: 'ಸಂಪರ್ಕ ಮಾಹಿತಿ',
+                send_message: 'ನಮಗೆ ಸಂದೇಶ ಕಳುಹಿಸಿ',
+                send_message_btn: 'ಸಂದೇಶ ಕಳುಹಿಸಿ',
+                
+                // Theme Settings
+                theme: 'ಥೀಮ್',
+                light_theme: 'ಬೆಳಕಿನ ಥೀಮ್',
+                dark_theme: 'ಕಪ್ಪು ಥೀಮ್'
+            },
+            hi: {
+                // Navigation
+                login: 'लॉगिन',
+                signup: 'साइन अप',
+                home: 'होम',
+                features: 'विशेषताएं',
+                about: 'हमारे बारे में',
+                contact: 'संपर्क',
+                navigation: 'नेवीगेशन',
+                farmer: 'किसान',
+                regulator: 'नियामक',
+                settings: 'सेटिंग्स',
+                language: 'भाषा',
+                back: 'वापस',
+                logout: 'लॉगआउट',
+                
+                // Landing page
+                hero_title: 'सुरक्षित भोजन, स्वस्थ पशु',
+                hero_description: 'खाद्य सुरक्षा, पशु कल्याण और नियामक अनुपालन सुनिश्चित करने वाली व्यापक एंटीमाइक्रोबियल उपयोग निगरानी प्रणाली।',
+                get_started: 'शुरू करें',
+                learn_more: 'और जानें',
+                key_features: 'मुख्य विशेषताएं',
+                usage_tracking: 'उपयोग ट्रैकिंग',
+                usage_tracking_desc: 'सभी पशुओं में एंटीमाइक्रोबियल उपयोग की वास्तविक समय निगरानी',
+                withdrawal_alerts: 'विदड्रॉल अलर्ट',
+                withdrawal_alerts_desc: 'विदड्रॉल अवधि और अनुपालन के लिए स्वचालित अलर्ट',
+                realtime_dashboard: 'रियल-टाइम डैशबोर्ड',
+                realtime_dashboard_desc: 'सभी हितधारकों के लिए व्यापक डैशबोर्ड',
+                blockchain_traceability: 'ब्लॉकचेन ट्रेसेबिलिटी',
+                blockchain_traceability_desc: 'पूर्ण पारदर्शिता के लिए अपरिवर्तनीय रिकॉर्ड',
+                
+                // Farmer Dashboard
+                farmer_dashboard: 'किसान डैशबोर्ड',
+                total_animals: 'कुल पशु',
+                active_treatments: 'सक्रिय उपचार',
+                pending_alerts: 'लंबित अलर्ट',
+                withdrawal_due: 'विदड्रॉल देय',
+                
+                // About Section
+                about_title: 'एग्रीसेफ के बारे में',
+                about_description: 'एग्रीसेफ कृषि में एंटीमाइक्रोबियल उपयोग निगरानी में क्रांति लाने के लिए डिज़ाइन किया गया एक अत्याधुनिक प्लेटफॉर्म है।',
+                mission: 'हमारा मिशन',
+                mission_desc: 'नवाचार प्रौद्योगिकी और जिम्मेदार प्रथाओं के माध्यम से एक टिकाऊ और सुरक्षित खाद्य प्रणाली बनाना।',
+                vision: 'हमारी दृष्टि',
+                vision_desc: 'एक ऐसी दुनिया जहां हर खाद्य उत्पाद पता लगाने योग्य, सुरक्षित और न्यूनतम पर्यावरणीय प्रभाव के साथ उत्पादित हो।',
+                values: 'हमारे मूल्य',
+                values_desc: 'पारदर्शिता, नवाचार, स्थिरता, और दुनिया भर के किसानों और नियामकों के साथ सहयोग।',
+                
+                // Contact Section
+                contact_title: 'हमसे संपर्क करें',
+                contact_description: 'समर्थन, साझेदारी या एग्रीसेफ के बारे में अधिक जानकारी के लिए हमारी टीम से संपर्क करें।',
+                contact_info: 'संपर्क जानकारी',
+                send_message: 'हमें संदेश भेजें',
+                send_message_btn: 'संदेश भेजें',
+                
+                // Theme Settings
+                theme: 'थीम',
+                light_theme: 'लाइट थीम',
+                dark_theme: 'डार्क थीम'
+            }
+        };
+
+        // Translation function
+        function translatePage(language) {
+            currentLanguage = language;
+            const elements = document.querySelectorAll('[data-translate]');
+            elements.forEach(element => {
+                const key = element.getAttribute('data-translate');
+                if (translations[language] && translations[language][key]) {
+                    element.textContent = translations[language][key];
+                }
+            });
+        }
+
+        // Theme functions
+        function setTheme(theme) {
+            currentTheme = theme;
+            const body = document.body;
+            
+            if (theme === 'dark') {
+                body.classList.add('dark');
+                body.classList.remove('bg-gray-50');
+                body.classList.add('bg-gray-900');
+                
+                // Update navigation
+                const nav = document.querySelector('nav');
+                if (nav) {
+                    nav.classList.remove('bg-white');
+                    nav.classList.add('bg-gray-800');
+                }
+                
+                // Update sidebar
+                const sidebar = document.getElementById('sidebar');
+                if (sidebar) {
+                    sidebar.classList.remove('bg-white');
+                    sidebar.classList.add('bg-gray-800');
+                }
+                
+                // Update all white backgrounds to dark
+                const whiteElements = document.querySelectorAll('.bg-white');
+                whiteElements.forEach(el => {
+                    el.classList.remove('bg-white');
+                    el.classList.add('bg-gray-800');
+                });
+                
+                // Update text colors
+                const grayTextElements = document.querySelectorAll('.text-gray-800, .text-gray-700, .text-gray-600');
+                grayTextElements.forEach(el => {
+                    el.classList.remove('text-gray-800', 'text-gray-700', 'text-gray-600');
+                    el.classList.add('text-white');
+                });
+                
+                // Update borders
+                const borderElements = document.querySelectorAll('.border-gray-200, .border-gray-300');
+                borderElements.forEach(el => {
+                    el.classList.remove('border-gray-200', 'border-gray-300');
+                    el.classList.add('border-gray-600');
+                });
+                
+            } else {
+                body.classList.remove('dark');
+                body.classList.remove('bg-gray-900');
+                body.classList.add('bg-gray-50');
+                
+                // Restore light theme (page reload would be needed for full restoration)
+                location.reload();
+            }
+            
+            // Update theme buttons
+            updateThemeButtons(theme);
+            
+            // Save theme preference
+            localStorage.setItem('agrisafe-theme', theme);
+        }
+
+        function updateThemeButtons(theme) {
+            const lightBtn = document.getElementById('lightTheme');
+            const darkBtn = document.getElementById('darkTheme');
+            
+            if (theme === 'dark') {
+                lightBtn.classList.remove('active');
+                lightBtn.querySelector('.fa-check').classList.add('hidden');
+                darkBtn.classList.add('active');
+                darkBtn.querySelector('.fa-check').classList.remove('hidden');
+            } else {
+                darkBtn.classList.remove('active');
+                darkBtn.querySelector('.fa-check').classList.add('hidden');
+                lightBtn.classList.add('active');
+                lightBtn.querySelector('.fa-check').classList.remove('hidden');
+            }
+        }
+
+        function loadTheme() {
+            const savedTheme = localStorage.getItem('agrisafe-theme') || 'light';
+            if (savedTheme === 'dark') {
+                setTheme('dark');
+            }
+        }
+
+        // Sidebar functions
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            const isHidden = sidebar.classList.contains('-translate-x-full');
+            
+            if (isHidden) {
+                sidebar.classList.remove('-translate-x-full');
+                sidebar.classList.remove('hidden');
+                overlay.classList.remove('hidden');
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                overlay.classList.add('hidden');
+            }
+        }
+
+        function closeSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            sidebar.classList.add('-translate-x-full');
+            overlay.classList.add('hidden');
+        }
+
+        // DOM Elements
+        const loginBtn = document.getElementById('loginBtn');
+        const signupBtn = document.getElementById('signupBtn');
+        const loginModal = document.getElementById('loginModal');
+        const closeLogin = document.getElementById('closeLogin');
+        const loginForm = document.getElementById('loginForm');
+        const otpSection = document.getElementById('otpSection');
+        const verifyOtp = document.getElementById('verifyOtp');
+        const mainContent = document.getElementById('mainContent');
+        const landingPage = document.getElementById('landingPage');
+        const farmerDashboard = document.getElementById('farmerDashboard');
+        const regulatorDashboard = document.getElementById('regulatorDashboard');
+        const sidebar = document.getElementById('sidebar');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        const languageSelect = document.getElementById('languageSelect');
+
+        // Modal elements
+        const addAnimalModal = document.getElementById('addAnimalModal');
+        const recordTreatmentModal = document.getElementById('recordTreatmentModal');
+        const addAnimalBtn = document.getElementById('addAnimalBtn');
+        const recordTreatmentBtn = document.getElementById('recordTreatmentBtn');
+        const scanQrBtn = document.getElementById('scanQrBtn');
+
+        // Event Listeners
+        loginBtn.addEventListener('click', () => {
+            loginModal.classList.remove('hidden');
+        });
+
+        signupBtn.addEventListener('click', () => {
+            loginModal.classList.remove('hidden');
+            // Change modal title for signup
+            document.querySelector('#loginModal h2').textContent = 'Sign Up for AgriSafe';
+        });
+
+        closeLogin.addEventListener('click', () => {
+            loginModal.classList.add('hidden');
+            otpSection.classList.add('hidden');
+            // Reset form
+            document.getElementById('loginForm').reset();
+            document.getElementById('otpInput').value = '';
+            // Reset modal title
+            document.querySelector('#loginModal h2').textContent = 'Login to AgriSafe';
+        });
+
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const identifier = document.getElementById('loginIdentifier').value;
+            const role = document.getElementById('userRole').value;
+            
+            if (identifier) {
+                // Simulate OTP sending
+                otpSection.classList.remove('hidden');
+                // Auto-fill OTP for demo
+                setTimeout(() => {
+                    document.getElementById('otpInput').value = '123456';
+                }, 1000);
+            }
+        });
+
+        verifyOtp.addEventListener('click', () => {
+            const otp = document.getElementById('otpInput').value;
+            const role = document.getElementById('userRole').value;
+            
+            if (otp === '123456') {
+                currentRole = role;
+                currentUser = document.getElementById('loginIdentifier').value;
+                
+                // Hide login modal first
+                loginModal.classList.add('hidden');
+                
+                // Reset form for next use
+                otpSection.classList.add('hidden');
+                document.getElementById('otpInput').value = '';
+                document.getElementById('loginIdentifier').value = '';
+                document.getElementById('loginForm').reset();
+                
+                // Hide landing page and show appropriate dashboard
+                landingPage.classList.add('hidden');
+                showDashboard(role);
+            } else {
+                alert('Invalid OTP. Please try 123456 for demo.');
+            }
+        });
+
+        // Logout handlers
+        document.getElementById('logoutBtn')?.addEventListener('click', logout);
+        document.getElementById('regLogoutBtn')?.addEventListener('click', logout);
+
+        // Back button handlers
+        document.getElementById('backToLanding')?.addEventListener('click', goBackToLanding);
+        document.getElementById('regBackToLanding')?.addEventListener('click', goBackToLanding);
+
+        // Get Started button
+        document.getElementById('getStartedBtn')?.addEventListener('click', () => {
+            currentRole = 'farmer';
+            currentUser = 'demo@farmer.com';
+            showDashboard('farmer');
+        });
+
+        // Sidebar event listeners
+        sidebarToggle?.addEventListener('click', toggleSidebar);
+        sidebarOverlay?.addEventListener('click', closeSidebar);
+        
+        // Sidebar navigation
+        document.getElementById('sidebarFarmer')?.addEventListener('click', () => {
+            currentRole = 'farmer';
+            currentUser = 'demo@farmer.com';
+            showDashboard('farmer');
+            closeSidebar();
+        });
+
+        document.getElementById('sidebarRegulator')?.addEventListener('click', () => {
+            currentRole = 'regulator';
+            currentUser = 'demo@regulator.com';
+            showDashboard('regulator');
+            closeSidebar();
+        });
+
+        // Language selection
+        languageSelect?.addEventListener('change', (e) => {
+            translatePage(e.target.value);
+        });
+
+        // Header language selection
+        document.getElementById('headerLanguageSelect')?.addEventListener('change', (e) => {
+            translatePage(e.target.value);
+            // Sync with sidebar language select
+            if (languageSelect) {
+                languageSelect.value = e.target.value;
+            }
+            // Sync with mobile language select
+            const mobileLanguageSelect = document.getElementById('mobileLanguageSelect');
+            if (mobileLanguageSelect) {
+                mobileLanguageSelect.value = e.target.value;
+            }
+        });
+
+        // Mobile language selection
+        document.getElementById('mobileLanguageSelect')?.addEventListener('change', (e) => {
+            translatePage(e.target.value);
+            // Sync with header language select
+            const headerLanguageSelect = document.getElementById('headerLanguageSelect');
+            if (headerLanguageSelect) {
+                headerLanguageSelect.value = e.target.value;
+            }
+            // Sync with sidebar language select
+            if (languageSelect) {
+                languageSelect.value = e.target.value;
+            }
+        });
+
+        // Mobile menu toggle
+        document.getElementById('mobileMenuBtn')?.addEventListener('click', () => {
+            const mobileMenu = document.getElementById('mobileMenu');
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        // Mobile auth buttons
+        document.getElementById('mobileLoginBtn')?.addEventListener('click', () => {
+            loginModal.classList.remove('hidden');
+            // Close mobile menu
+            document.getElementById('mobileMenu').classList.add('hidden');
+        });
+
+        document.getElementById('mobileSignupBtn')?.addEventListener('click', () => {
+            loginModal.classList.remove('hidden');
+            document.querySelector('#loginModal h2').textContent = 'Sign Up for AgriSafe';
+            // Close mobile menu
+            document.getElementById('mobileMenu').classList.add('hidden');
+        });
+
+        // Smooth scrolling for menu links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                }
+                // Close mobile menu if open
+                document.getElementById('mobileMenu').classList.add('hidden');
+            });
+        });
+
+        // Modal handlers
+        addAnimalBtn?.addEventListener('click', () => {
+            addAnimalModal.classList.remove('hidden');
+        });
+
+        recordTreatmentBtn?.addEventListener('click', () => {
+            recordTreatmentModal.classList.remove('hidden');
+        });
+
+        scanQrBtn?.addEventListener('click', () => {
+            alert('QR/Barcode scanner would open here. This feature requires camera access.');
+        });
+
+        // Close modal handlers
+        document.getElementById('closeAddAnimal')?.addEventListener('click', () => {
+            addAnimalModal.classList.add('hidden');
+        });
+
+        document.getElementById('closeRecordTreatment')?.addEventListener('click', () => {
+            recordTreatmentModal.classList.add('hidden');
+        });
+
+        // Form handlers
+        document.getElementById('addAnimalForm')?.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const animalId = e.target.querySelector('input[placeholder="e.g., COW-123"]').value;
+            const species = e.target.querySelector('select').value;
+            const age = e.target.querySelector('input[placeholder="e.g., 2 years"]').value;
+            const status = e.target.querySelectorAll('select')[1].value;
+            
+            // Add to animals array
+            animals.push({
+                id: animalId,
+                species: species.charAt(0).toUpperCase() + species.slice(1),
+                age: age,
+                status: status.charAt(0).toUpperCase() + status.slice(1).replace('-', ' ')
+            });
+            
+            // Update table
+            updateAnimalsTable();
+            
+            alert('Animal added successfully!');
+            addAnimalModal.classList.add('hidden');
+            e.target.reset();
+        });
+
+        document.getElementById('recordTreatmentForm')?.addEventListener('submit', (e) => {
+            e.preventDefault();
+            alert('Treatment recorded successfully!');
+            recordTreatmentModal.classList.add('hidden');
+        });
+
+        function showDashboard(role) {
+            // Hide all dashboards first
+            farmerDashboard.classList.add('hidden');
+            regulatorDashboard.classList.add('hidden');
+            landingPage.classList.add('hidden');
+            
+            // Show sidebar toggle button
+            const sidebarToggleBtn = document.getElementById('sidebarToggle');
+            if (sidebarToggleBtn) {
+                sidebarToggleBtn.classList.remove('hidden');
+            }
+            
+            // Show sidebar
+            sidebar.classList.remove('hidden');
+            
+            // Show the correct dashboard based on role
+            switch(role) {
+                case 'farmer':
+                    farmerDashboard.classList.remove('hidden');
+                    updateAnimalsTable();
+                    break;
+                case 'regulator':
+                    regulatorDashboard.classList.remove('hidden');
+                    setTimeout(() => initializeCharts(), 100); // Small delay for proper rendering
+                    break;
+                default:
+                    landingPage.classList.remove('hidden');
+            }
+        }
+
+        function logout() {
+            currentUser = null;
+            currentRole = null;
+            farmerDashboard.classList.add('hidden');
+            regulatorDashboard.classList.add('hidden');
+            landingPage.classList.remove('hidden');
+            
+            // Show sidebar and toggle button on landing page
+            sidebar.classList.remove('hidden');
+            const sidebarToggleBtn = document.getElementById('sidebarToggle');
+            if (sidebarToggleBtn) {
+                sidebarToggleBtn.classList.remove('hidden');
+            }
+        }
+
+        function goBackToLanding() {
+            farmerDashboard.classList.add('hidden');
+            regulatorDashboard.classList.add('hidden');
+            landingPage.classList.remove('hidden');
+            
+            // Keep sidebar and toggle button visible on landing page
+            sidebar.classList.remove('hidden');
+            closeSidebar();
+            const sidebarToggleBtn = document.getElementById('sidebarToggle');
+            if (sidebarToggleBtn) {
+                sidebarToggleBtn.classList.remove('hidden');
+            }
+        }
+
+        function updateAnimalsTable() {
+            const tbody = document.querySelector('#farmerDashboard tbody');
+            if (tbody) {
+                tbody.innerHTML = '';
+                animals.forEach(animal => {
+                    const statusClass = animal.status === 'Healthy' ? 'bg-green-100 text-green-800' : 
+                                       animal.status === 'Under Treatment' ? 'bg-yellow-100 text-yellow-800' : 
+                                       'bg-red-100 text-red-800';
+                    
+                    const row = `
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${animal.id}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${animal.species}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${animal.age}</td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${statusClass}">${animal.status}</span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                <button class="text-blue-600 hover:text-blue-900 mr-3">View</button>
+                                <button class="text-green-600 hover:text-green-900 mr-3">Edit</button>
+                                <button class="text-red-600 hover:text-red-900" onclick="deleteAnimal('${animal.id}')">Delete</button>
+                            </td>
+                        </tr>
+                    `;
+                    tbody.innerHTML += row;
+                });
+            }
+        }
+
+        function deleteAnimal(animalId) {
+            if (confirm(`Are you sure you want to delete ${animalId}? This action cannot be undone.`)) {
+                // Remove animal from array
+                animals = animals.filter(animal => animal.id !== animalId);
+                
+                // Update the table
+                updateAnimalsTable();
+                
+                alert(`${animalId} has been deleted successfully!`);
+            }
+        }
+
+        function initializeCharts() {
+            // Species Chart
+            const speciesCtx = document.getElementById('speciesChart');
+            if (speciesCtx) {
+                new Chart(speciesCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Cattle', 'Swine', 'Poultry', 'Sheep', 'Goat'],
+                        datasets: [{
+                            data: [35, 25, 20, 12, 8],
+                            backgroundColor: [
+                                '#3B82F6',
+                                '#10B981',
+                                '#F59E0B',
+                                '#EF4444',
+                                '#8B5CF6'
+                            ]
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom'
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Region Chart
+            const regionCtx = document.getElementById('regionChart');
+            if (regionCtx) {
+                new Chart(regionCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['North', 'South', 'East', 'West', 'Central'],
+                        datasets: [{
+                            label: 'AMU Records',
+                            data: [1200, 900, 800, 1100, 750],
+                            backgroundColor: '#3B82F6'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        // Theme event listeners
+        document.getElementById('lightTheme')?.addEventListener('click', () => {
+            setTheme('light');
+        });
+
+        document.getElementById('darkTheme')?.addEventListener('click', () => {
+            setTheme('dark');
+        });
+
+        // Contact form handler
+        document.getElementById('contactForm')?.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const name = e.target.querySelector('input[type="text"]').value;
+            const email = e.target.querySelector('input[type="email"]').value;
+            const message = e.target.querySelector('textarea').value;
+            
+            if (name && email && message) {
+                alert('Thank you for your message! We will get back to you soon.');
+                e.target.reset();
+            } else {
+                alert('Please fill in all fields.');
+            }
+        });
+
+        // Close modals when clicking outside
+        window.addEventListener('click', (e) => {
+            if (e.target === loginModal) {
+                loginModal.classList.add('hidden');
+                otpSection.classList.add('hidden');
+                document.getElementById('loginForm').reset();
+                document.getElementById('otpInput').value = '';
+                document.querySelector('#loginModal h2').textContent = 'Login to AgriSafe';
+            }
+            if (e.target === addAnimalModal) {
+                addAnimalModal.classList.add('hidden');
+            }
+            if (e.target === recordTreatmentModal) {
+                recordTreatmentModal.classList.add('hidden');
+            }
+        });
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', () => {
+            loadTheme();
+        });
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'984c10eed3c47adf',t:'MTc1ODgxOTUwNC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
